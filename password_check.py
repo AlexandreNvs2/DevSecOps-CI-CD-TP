@@ -8,7 +8,7 @@ def worst_500_passwords(password):
   import requests
   print('Beginning check in 500 worst passwords')
   url = 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Common-Credentials/500-worst-passwords.txt'
-  retrieve = requests.get(url)
+  retrieve = requests.get(url, timeout=10)
 
   content = retrieve.content
 
@@ -22,7 +22,7 @@ def worst_10k_passwords(password):
   import requests
   print('Beginning check in 10K worst passwords')
   url = 'https://raw.githubusercontent.com/danielmiessler/SecLists/master/Passwords/Common-Credentials/10k-most-common.txt'
-  retrieve = requests.get(url)
+  retrieve = requests.get(url, timeout= 10)
 
   content = retrieve.content
 
