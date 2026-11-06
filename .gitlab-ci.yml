@@ -2,6 +2,7 @@ stages:
   - lint
   - security
   - build
+  - tests
 
 # ───────── Activité 1 : Python (Flake8 + Bandit) ─────────
 flake8_code:
@@ -49,4 +50,27 @@ image_build:
   artifacts:
     paths:
       - image
+  allow_failure: false
+
+image_tests:
+  stage: tests
+  image: docker:24
+  services:
+    - docker:24.0.5-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  needs: [image_build]
+  before_script:
+    - docker load -i image/mynginx.tar
+  script:
+    - docker run --rm --name test -d mynginx:1.0
+    - docker exec test git version                       # les outils fonctionnent
+    - docker exec test curl --version
+    - docker exec test grep user /etc/passwd             # l'utilisateur existe
+    - docker exec -u root test nginx -t                  # la config nginx est valide
+    - docker exec -u root test service nginx start       # démarrage du serveur web
+    - sleep 2
+    - docker exec test curl -fsS http://127.0.0.1 > /dev/null && echo "HTTP OK"   # le serveur répond
+  after_script:
+    - docker rm -f test || true
   allow_failure: false
