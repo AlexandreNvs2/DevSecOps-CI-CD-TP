@@ -1,0 +1,11 @@
+stages:
+  - lint
+  
+flake8_code:
+  stage: lint
+  image: python
+  before_script:
+    - pip install flake8
+  script:
+    - flake8 password_check.py
+  allow_failure: true
