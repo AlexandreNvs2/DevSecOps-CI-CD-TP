@@ -30,5 +30,5 @@ dockerfile_lint:
     LANG: C.UTF-8
   script:
     - cd "Activité6"
-    - hadolint "Activité6/Dockerfile"
+    - hadolint Dockerfile
   allow_failure: false
