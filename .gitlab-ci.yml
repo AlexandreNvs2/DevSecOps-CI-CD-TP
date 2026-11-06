@@ -26,6 +26,9 @@ security_code:
 dockerfile_lint:
   stage: lint
   image: hadolint/hadolint:2.9.2-debian
+  variables:
+    LANG: C.UTF-8
   script:
+    - cd "Activité6"
     - hadolint "Activité6/Dockerfile"
   allow_failure: false
