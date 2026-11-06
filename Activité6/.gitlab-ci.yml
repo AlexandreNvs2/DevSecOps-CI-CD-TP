@@ -1,9 +1,0 @@
-stages:
-  - lint
-
-dockerfile_lint:
-  stage: lint
-  image: hadolint/hadolint:2.9.2-debian
-  script:
-    - hadolint Dockerfile
-  allow_failure: false

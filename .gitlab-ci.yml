@@ -1,0 +1,31 @@
+stages:
+  - lint
+  - security
+
+# ───────── Activité 1 : Python (Flake8 + Bandit) ─────────
+flake8_code:
+  stage: lint
+  image: python
+  before_script:
+    - pip install flake8
+  script:
+    - flake8 "Activité1/password_check.py"
+  allow_failure: true
+
+security_code:
+  stage: security
+  image: python
+  needs: [flake8_code]
+  before_script:
+    - pip install bandit
+  script:
+    - bandit -r "Activité1/password_check.py"
+  allow_failure: true
+
+# ───────── Activité 6 : Dockerfile (Hadolint) ─────────
+dockerfile_lint:
+  stage: lint
+  image: hadolint/hadolint:2.9.2-debian
+  script:
+    - hadolint "Activité6/Dockerfile"
+  allow_failure: false
