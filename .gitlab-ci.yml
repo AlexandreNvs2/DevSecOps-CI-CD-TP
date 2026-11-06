@@ -1,13 +1,9 @@
-services:
-  - docker:24.0.5-dind
-
 stages:
   - lint
   - security
   - build
   - tests
 
-# ───────── Activité 1 ─────────
 flake8_code:
   stage: lint
   image: python
@@ -27,7 +23,6 @@ security_code:
     - bandit -r "Activité1/password_check.py"
   allow_failure: true
 
-# ───────── Activité 6 ─────────
 dockerfile_lint:
   stage: lint
   image: hadolint/hadolint:2.9.2-debian
@@ -41,10 +36,15 @@ dockerfile_lint:
 image_build:
   stage: build
   image: docker:24
+  services:
+    - docker:24.0.5-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  needs: [dockerfile_lint]
   script:
     - docker build --no-cache -t mynginx:1.0 "Activité6"
     - mkdir image
-    - docker save mynginx > image/mynginx.tar
+    - docker save mynginx:1.0 > image/mynginx.tar
   artifacts:
     paths:
       - image
@@ -53,12 +53,17 @@ image_build:
 image_tests:
   stage: tests
   image: docker:24
+  services:
+    - docker:24.0.5-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  needs: [image_build]
   before_script:
     - docker load -i image/mynginx.tar
   script:
-    - docker run --rm --name test -it -d mynginx:1.0
+    - docker run --rm --name test -d mynginx:1.0
     - docker exec test git version
-    - docker exec test sudo service nginx start
-    - docker exec test curl 127.0.0.1
     - docker exec test grep user /etc/passwd
+    - docker exec -u 0 test service nginx start   # 👈 ROOT : "-u 0" exécute uniquement cette commande en root (UID 0), à la place de sudo
+    - docker exec test curl 127.0.0.1
   allow_failure: false
